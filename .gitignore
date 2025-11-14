@@ -1,0 +1,71 @@
+cat <<'EOF' > .gitignore
+#############################
+# GLOBAL INFRA IGNORE RULES #
+#############################
+
+# === Secrets (never commit) ===
+/secrets/
+/**/secrets/
+/**/.secrets/
+/**/*.key
+/**/*.pem
+/**/*.crt
+/**/*.pfx
+
+# === Environment files ===
+# Block all .env-like files...
+**/.env
+**/.env.*
+# ...but allow the examples we want in Git
+!**/.env.example
+
+# === Backups / dumps / archives ===
+/backup/
+/**/backup/
+/**/backups/
+/**/*.sql
+/**/*.sql.gz
+/**/*.dump
+/**/*.tgz
+/**/*.tar
+/**/*.tar.gz
+
+# === Runtime / temp / cache ===
+/tmp/
+/**/tmp/
+/**/.cache/
+/**/*.log
+/**/*.log.*
+/**/*.pid
+**/*.pyc
+**/__pycache__/
+
+# === Docker / build artifacts (safe to recreate) ===
+**/node_modules/
+**/dist/
+**/build/
+
+# === Editor / OS noise ===
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini
+
+########################################
+# STACKS: IGNORE ALL DATA BY DEFAULT   #
+########################################
+
+# Ignore everything under stacks/*/*
+stacks/*/*
+
+# But keep core infra files in each stack root
+!stacks/*/
+!stacks/*/docker-compose.yml
+!stacks/*/.env.example
+!stacks/*/README.md
+
+# Allow stack-local scripts (if you add any)
+/stacks/*/scripts/**
+EOF

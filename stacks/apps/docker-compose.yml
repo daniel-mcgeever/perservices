@@ -1,0 +1,94 @@
+services:
+  db:
+    image: postgres:${PG_VERSION}
+    container_name: db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: ${TZ}
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    networks:
+      - apps_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    mem_limit: "1g"        # adjust to taste
+    cpus: "1.0"
+
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest   # TODO: pin version
+    container_name: mealie
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+      SECRET: ${MEALIE_SECRET}
+      BASE_URL: ${MEALIE_BASE_URL}
+      DB_ENGINE: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_SERVER: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./mealie:/app/data
+    ports:
+      # if reverse-proxied from another box, you can bind to localhost only:
+      # - "127.0.0.1:9925:9000"
+      - "9925:9000"
+    networks:
+      - apps_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/api/app/about || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    mem_limit: "1g"
+    cpus: "1.0"
+
+  firefly:
+    image: fireflyiii/core:latest                 # TODO: pin version
+    container_name: firefly
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      APP_KEY: ${FIREFLY_APP_KEY}
+      APP_URL: ${FIREFLY_APP_URL}
+      TRUSTED_PROXIES: ${FIREFLY_TRUSTED_PROXIES}
+      TZ: ${TZ}
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${FIREFLY_DB_DATABASE}
+      DB_USERNAME: ${FIREFLY_DB_USERNAME}
+      DB_PASSWORD: ${FIREFLY_DB_PASSWORD}
+    volumes:
+      - ./firefly/uploads:/var/www/html/storage/upload
+    ports:
+      # again, can be 127.0.0.1 if proxied
+      - "9927:8080"
+    networks:
+      - apps_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    mem_limit: "1g"
+    cpus: "1.0"
+
+networks:
+  apps_net:
+    driver: bridge

@@ -1,0 +1,21 @@
+services:
+  home:
+    image: caddy:2
+    container_name: home
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      # LAN site: http://<host>:8090
+      - "8090:80"
+    volumes:
+      # Use explicit absolute path (no /opt, no relative host path)
+      - /srv/infra/stacks/home/site:/usr/share/caddy:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:80/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    mem_limit: "256m"
+    cpus: "0.5"

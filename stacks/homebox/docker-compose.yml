@@ -1,0 +1,26 @@
+services:
+  homebox:
+    image: ghcr.io/hay-kot/homebox:latest   # TODO: pin version
+    container_name: homebox
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TZ: ${TZ}
+      HBOX_ALLOWED_HOSTS: ${HBOX_ALLOWED_HOSTS}
+      HBOX_MODE: ${HBOX_MODE}
+      HBOX_LOG_LEVEL: ${HBOX_LOG_LEVEL}
+      HBOX_DATABASE_URL: "sqlite:////data/homebox.db"
+    volumes:
+      - ./data:/data
+    ports:
+      # restrict to LAN as desired
+      - "9926:7745"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7745/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    mem_limit: "512m"
+    cpus: "0.5"
