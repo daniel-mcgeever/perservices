@@ -10,7 +10,7 @@ services:
       HBOX_LOG_LEVEL: ${HBOX_LOG_LEVEL}
       HBOX_DATABASE_URL: "sqlite:////data/homebox.db"
     volumes:
-      - ./data:/data
+      - /srv/infra/stacks/homebox/data:/data
     ports:
       # restrict to LAN as desired
       - "9926:7745"
