@@ -8,11 +8,5 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:9001/ || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
     mem_limit: "256m"
     cpus: "0.5"
