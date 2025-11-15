@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       TZ: ${TZ}
     volumes:
-      - ./db-data:/var/lib/postgresql/data
+      - /srv/infra/stacks/apps/db-data:/var/lib/postgresql/data
     networks:
       - apps_net
     healthcheck:
@@ -39,7 +39,7 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./mealie:/app/data
+      - /srv/infra/stacks/apps/mealie:/app/data
     ports:
       # if reverse-proxied from another box, you can bind to localhost only:
       # - "127.0.0.1:9925:9000"
@@ -74,7 +74,7 @@ services:
       DB_USERNAME: ${FIREFLY_DB_USERNAME}
       DB_PASSWORD: ${FIREFLY_DB_PASSWORD}
     volumes:
-      - ./firefly/uploads:/var/www/html/storage/upload
+      - /srv/infra/stacks/apps/firefly/uploads:/var/www/html/storage/upload
     ports:
       # again, can be 127.0.0.1 if proxied
       - "9927:8080"
