@@ -47,7 +47,7 @@ services:
     networks:
       - apps_net
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/api/app/about || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/api/app/about || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
