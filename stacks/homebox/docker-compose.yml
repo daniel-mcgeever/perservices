@@ -3,8 +3,6 @@ services:
     image: ghcr.io/hay-kot/homebox:latest   # TODO: pin version
     container_name: homebox
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
       TZ: ${TZ}
       HBOX_ALLOWED_HOSTS: ${HBOX_ALLOWED_HOSTS}
